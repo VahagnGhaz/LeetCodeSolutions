@@ -72,14 +72,36 @@ public:
     }
     return res;
   }
+  //
+  bool valueCompare(const pair<int, int> &a, const pair<int, int> &b) {
+    // used for topKFrequent, compare by value (pair represent map's <key,
+    // value>), getting compiler error when using, see lambda function instead
+    return a.second > b.second;
+  }
+  // 347. Top K Frequent Elements
+  vector<int> topKFrequent(vector<int> &nums, int k) {
+    vector<int> mostFrequent;
+    unordered_map<int, int> counter;
+    // populate
+    for (int num : nums) {
+      counter[num]++;
+    }
+    // sort counter
+    vector<pair<int, int>> sortedMap(counter.begin(), counter.end());
+    sort(sortedMap.begin(), sortedMap.end(),
+         [](const pair<int, int> &a, const pair<int, int> &b) {
+           return a.second > b.second;
+         });
+    for (int i = 0; i < k; i++)
+      mostFrequent.push_back(sortedMap[i].first);
+    return mostFrequent;
+  }
 };
 int main() {
-  Solution s;
-  vector<int> nums = {2, 7, 11, 15};
-  int target = 9;
-  vector<int> res = s.twoSum(nums, target);
-  for (const auto &element : res) {
-    cout << element << " ";
-  }
+  int target = 2;
+  vector<int> vec = {1};
+  vector<int> res = s.topKFrequent(vec, target);
+  for (int item : res)
+    cout << item;
   return 0;
 }

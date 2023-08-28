@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            // "compilerPath": "g++",
+            "cStandard": "c11",
+            "cppStandard": "c++20", // important for IntelliSense engine to recognize 
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}
