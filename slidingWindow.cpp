@@ -9,6 +9,20 @@ using namespace std;
 
 class Solution {
 public:
+  // 53. Maximum Subarray
+  int maxSubArray(vector<int> &nums) {
+    int maxSum = nums[0], currSum = nums[0];
+    for (int i = 1; i < nums.size(); i++) {
+      //   sliding window
+      //    if (currSum < 0):
+      //        currSum = 0
+      // current_max+=num
+      currSum = max(nums[i], currSum + nums[i]);
+      maxSum = max(maxSum, currSum);
+    }
+    return maxSum;
+  }
+  // 121. Best Time to Buy and Sell Stock
   int maxProfit(vector<int> &prices) {
     // 1.
     // int lowestSoFar = prices[0]; // hint

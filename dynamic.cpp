@@ -25,60 +25,111 @@ public:
     return false;
   };
 
-  bool canSumWithCache(vector<int> &candidates, int target,
-                       unordered_map<int, bool> &canSumCache) {
+  bool canSumWithMemo(vector<int> &candidates, int target,
+                      unordered_map<int, bool> &canSumMemo) {
     // n: candidates size (tree width), m: target (tree depth)
     // memoized: Time: O(n*m) Space: O(m) callStack height
-    if (canSumCache.count(target)) // saved in cache, true or false
-      return canSumCache[target];
+    if (canSumMemo.count(target)) // saved in Memo, true or false
+      return canSumMemo[target];
     if (target == 0) // found a combination sum up to target
       return true;
     if (target < 0) // combination does not sum up to target
       return false;
     for (int candidate : candidates) {
       int newCandidate = target - candidate;
-      if (canSumWithCache(candidates, newCandidate, canSumCache)) {
-        canSumCache[target] = true;
+      if (canSumWithMemo(candidates, newCandidate, canSumMemo)) {
+        canSumMemo[target] = true;
         return true;
       }
       // else continue to check other candidates
     }
-    canSumCache[target] = false; // all candidates fail to sum to target
+    canSumMemo[target] = false; // all candidates fail to sum to target
     return false;
   };
+  bool howSum(vector<int> &candidates, int target, vector<int> &combination) {
+    // change combination given as reference
+    if (target == 0)
+      return true;
+    if (target < 0)
+      return false;
 
-  void howSum(vector<int> &candidates, int target, vector<int> &combination) {
-    if (target == 0) // found a combination
-    {
-      combination = {};
-      return;
-    }
-    if (target < 0) {
-      combination = {-1};
-      return;
-    }
     for (int candidate : candidates) {
       int newCandidate = target - candidate;
-      howSum(candidates, newCandidate, combination);
-      if (combination.empty() || combination[0] != -1) {
-        combination.push_back(newCandidate);
-        return;
-        // return combination;
+      // if found the last sum element , recursively append the rest
+      if (howSum(candidates, newCandidate, combination)) {
+        combination.push_back(candidate);
+        return true;
       }
     }
-    combination = {-1};
+    return false;
+  }
+  bool howSumWithMemo(vector<int> &candidates, int target,
+                      vector<int> &combination,
+                      unordered_map<int, bool> &canSumMemo) {
+    // change combination given as reference
+    if (canSumMemo.count(target)) // saved in Memo, true or false
+      return canSumMemo[target];
+    if (target == 0)
+      return true;
+    if (target < 0)
+      return false;
+
+    for (int candidate : candidates) {
+      int newCandidate = target - candidate;
+      // if found the last sum element , recursively append the rest
+      if (howSum(candidates, newCandidate, combination)) {
+        combination.push_back(candidate);
+        canSumMemo[target] = true;
+        return true;
+      }
+    }
+    canSumMemo[target] = false;
+    return false;
+  }
+  // 70. Climbing Stairs
+
+  int countWaysMemo(int n, unordered_map<int, int> memo) {
+    // memory limit exceeded: Time: O(n), Space: O(n)
+    if (memo.count(n) != 0)
+      return memo[n];
+    memo[n] = countWaysMemo(n - 1, memo) + countWaysMemo(n - 2, memo);
+    return memo[n];
+  }
+  int climbStairs(int n) {
+    // unordered_map<int, int> memo{{1, 1}, {2, 2}}; // default cases
+    // return countWays(n, memo);
+    // tabular solution (no need for array for this one: basic fib)
+    if (n == 1)
+      return 1;
+    int one = 1, two = 2, tmp = 0;
+    for (int i = 2; i < n; i++) {
+      tmp = two;
+      two = one + two;
+      one = tmp;
+    }
+    return two;
+  }
+  int getMinCost(vector<int> &cost, int index, unordered_map<int, int> memo) {
+    if (memo.count(index) != 0)
+      return memo[index];
+    if (index == cost.size())
+      return cost[index];
+    memo[index] =
+        getMinCost(cost, index + 1, memo) + getMinCost(cost, index + 2, memo);
+    return memo[index];
+  }
+  int minCostClimbingStairs(vector<int> &cost) {
+    unordered_map<int, int> memo; // default cases
+    return min(getMinCost(cost, 0, memo), getMinCost(cost, 1, memo));
   }
 };
 int main() {
   Solution s;
-  vector<int> nums = {2, 3, 6, 7};
-  //   vector<vector<int>> res = s.canSumWithCache(nums, 7);
-  unordered_map<int, bool> cache;
-  vector<int> comb;
-  // vector<int> res = s.howSum(nums, 7, comb);
-  s.howSum(nums, 7, comb);
-  for (auto vec : comb)
-    cout << vec;
+  vector<int> nums = {10, 15, 20};
+  int res = s.minCostClimbingStairs(nums);
+  cout << res << endl;
+  // for (auto vec : comb)
+  //   cout << vec;
 
   //   for (auto vec : res) {
   //     for (auto val : vec) {

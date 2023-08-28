@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <climits>
 #include <iostream>
 #include <queue>
 #include <stack>
@@ -6,6 +7,7 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+
 using namespace std;
 
 struct TreeNode {
@@ -91,6 +93,7 @@ void printLevelOrder(TreeNode *root) {
 
 class Solution {
 public:
+  // 104. Maximum Depth of Binary Tree
   int maxDepth(TreeNode *root) {
     // 1: recursive DFS: call stack, Time: O(n) Space: O(h)
     if (root == nullptr)
@@ -137,6 +140,7 @@ public:
     // }
     // return level;
   }
+  // 226. Invert Binary Tree
   TreeNode *invertTree(TreeNode *root) {
     if (root == nullptr)
       return nullptr;
@@ -150,11 +154,11 @@ public:
     // invertTree(root->right);
     return root;
   }
+  // 110. Balanced Binary Tree
   int isBalancedCore(TreeNode *root, bool &answer) {
     // get height
     // helper function for isBalanced, can assign answer globally in Solution
-
-    if (root == nullptr)
+    if (root == nullptr || answer == false) // is not balanced return to main
       return 0;
     int leftSize = isBalancedCore(root->left, answer);
     int rightSize = isBalancedCore(root->right, answer);
@@ -168,6 +172,7 @@ public:
     isBalancedCore(root, balanced);
     return balanced;
   }
+  // 543. Diameter of Binary Tree
   int diameter; // assigned globally
   int diameterOfBinaryTreeCore(TreeNode *root) {
     if (root == nullptr)
@@ -182,6 +187,7 @@ public:
     diameterOfBinaryTreeCore(root);
     return diameter;
   }
+  // 100. Same Tree
   bool isSameTree(TreeNode *p, TreeNode *q) {
     if (p == nullptr && q == nullptr)
       return true;
@@ -191,7 +197,7 @@ public:
     bool sameRight = isSameTree(p->right, q->right);
     return sameLeft && sameRight && p->val == q->val; // **
   }
-
+  // 572. Subtree of Another Tree
   bool isSubtree(TreeNode *root, TreeNode *subRoot) {
     if (root == nullptr)
       return false;
@@ -203,6 +209,7 @@ public:
       return true;
     return isSubtree(root->left, subRoot) || isSubtree(root->right, subRoot);
   }
+
   TreeNode *lowestCommonAncestor(TreeNode *root, TreeNode *p, TreeNode *q) {
     // 1. works for all kinds of trees: Time: O(n) Space: O(logn) if balanced
     // else O(n) ( maximum depth of the recursion stack )
@@ -232,6 +239,7 @@ public:
     }
     return nullptr; // guaranteed to not reach here
   }
+
   vector<vector<int>> levelOrder(TreeNode *root) {
     // BFS
     vector<vector<int>> levels;
@@ -283,21 +291,26 @@ public:
     }
     return rightSide;
   }
-  bool isValidBST(TreeNode *root) {
+  bool isValidBSTCore(TreeNode *root, long long leftBoundary,
+                      long long rightBoundary) {
     bool bstInvariant = true;
     if (root == nullptr)
       return bstInvariant;
-    // check each subTree existence and validity separately
-    if (root->left != nullptr)
-      bstInvariant = root->left->val < root->val;
-    if (root->right != nullptr)
-      bstInvariant = bstInvariant && root->right->val > root->val;
-    return bstInvariant && isValidBST(root->left) && isValidBST(root->left);
+
+    bstInvariant = leftBoundary < root->val && root->val < rightBoundary;
+    return bstInvariant &&
+           isValidBSTCore(root->left, leftBoundary, root->val) &&
+           isValidBSTCore(root->right, root->val, rightBoundary);
+  }
+  bool isValidBST(TreeNode *root) {
+    // for handling edge case, use long long type for boundary
+    return isValidBSTCore(root, numeric_limits<long long>::min(),
+                          numeric_limits<long long>::max());
   }
 };
 int main() {
   Solution s;
-  vector<int> list1 = {5, 4, 6, -1, -1, 3, 7};
+  vector<int> list1 = {-2147483648, -1, 2147483647};
   // vector<int> list2 = {4, 1, 2};
   TreeNode *root1 = vectorToBinaryTree(list1);
   bool res = s.isValidBST(root1);

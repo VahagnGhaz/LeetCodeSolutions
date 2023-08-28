@@ -31,12 +31,12 @@ ListNode *vectorToLinkedList(const vector<int> &vec) {
     current->next = new ListNode(vec[i]); // new ListNode{vec[i], nullptr};
     current = current->next;
   }
-
   return head;
 }
 
 class Solution {
 public:
+  // 141. Linked List Cycle
   bool hasCycle(ListNode *head) {
     // hash set
     // unordered_set<ListNode *> nodes;
@@ -61,6 +61,7 @@ public:
     }
     return false;
   }
+  // 21. Merge Two Sorted Lists
   ListNode *mergeTwoLists(ListNode *list1, ListNode *list2) {
     ListNode *head, *l;
     head = l = new ListNode();
@@ -77,6 +78,7 @@ public:
     l->next = list1 == nullptr ? list2 : list1;
     return head->next;
   }
+  // 203. Remove Linked List Elements
   ListNode *removeElements(ListNode *head, int val) {
     ListNode *dummy = new ListNode(0, head);
     // tail->next = head;
@@ -94,6 +96,7 @@ public:
     }
     return dummy->next;
   }
+  // 206. Reverse Linked List
   ListNode *reverseList(ListNode *head) {
     ListNode *curr = head;
     ListNode *nxt = nullptr;
@@ -106,6 +109,7 @@ public:
     }
     return prev;
   }
+  // 83. Remove Duplicates from Sor
   ListNode *deleteDuplicates(ListNode *head) {
     // ListNode * dummy = new ListNode(0, head);
     ListNode *tail = head;
@@ -117,6 +121,7 @@ public:
     }
     return head;
   }
+  // 2. Add Two Numbers
   ListNode *addTwoNumbers(ListNode *l1, ListNode *l2) {
     int sum, remainder = 0;
     ListNode *sumList = new ListNode();
@@ -148,6 +153,7 @@ public:
 
     return head->next;
   }
+  // 143. Reorder List
   void reorderList(ListNode *head) {
     // edge case is handled, but has speed improvement if included
     if (!head)
@@ -191,9 +197,10 @@ public:
       current = nxt1;
       previous = nxt2;
     }
-    if (nxt1)               // if list is empty or has one elem => nxt is NULL
+    if (nxt1 != nullptr)    // if list is empty or has one elem => nxt is NULL
       nxt1->next = nullptr; // ** nxt1 is the last element
   }
+
   ListNode *removeNthFromEnd(ListNode *head, int n) {
     // n is postion from tail
     if (head == nullptr)

@@ -20,49 +20,68 @@ struct TreeNode {
 
 class Solution {
 public:
-  void generateSubsets(vector<vector<int>> &subsets, vector<int> &subset,
-                       vector<int> &nums, int idx) {
+  vector<vector<int>> allSubsets;
+  vector<int> subset;
+  void generateSubsets(vector<int> &nums, int idx) {
     if (idx == nums.size()) { // function is called nums.size() times(leaf node)
-      subsets.push_back(subset);
+      allSubsets.push_back(subset);
       return;
     }
     subset.push_back(nums[idx]); // include nums[idx]
-    generateSubsets(subsets, subset, nums, idx + 1);
+    generateSubsets(nums, idx + 1);
     subset.pop_back(); // exclude nums[idx]
-    generateSubsets(subsets, subset, nums, idx + 1);
+    generateSubsets(nums, idx + 1);
   }
   vector<vector<int>> subsets(vector<int> &nums) {
-    vector<vector<int>> subsets;
-    vector<int> subset;
-    generateSubsets(subsets, subset, nums, 0);
-    return subsets;
+    generateSubsets(nums, 0);
+    return allSubsets;
   }
-  vector<vector<int>> combinations;
+  int sum = 0;
   vector<int> combination;
+  vector<vector<int>> allCombinations;
+  void generateCombinations(vector<int> &candidates, int idx, int target) {
+
+    if (sum == target) {
+      allCombinations.push_back(combination);
+      return;
+    }
+    if (sum > target || idx == candidates.size())
+      return;
+
+    combination.push_back(candidates[idx]); // include nums[idx]
+    sum += candidates[idx];
+    generateCombinations(candidates, idx, target);
+
+    combination.pop_back(); // exclude nums[idx]
+    sum -= candidates[idx];
+    generateCombinations(candidates, idx + 1, target); // shift the pointer
+    return;
+  }
 
   vector<vector<int>> combinationSum(vector<int> &candidates, int target) {
-
-    for (int candidate : candidates) {
-      int newCandidate = target - candidate;
-
-      if (newCandidate == 0) { // found a combination
-        combinations.push_back(combination);
-        return combinations;
-      }
-      if (newCandidate < 0) {
-        combination.pop_back(); // remove last added candidate
-        return combinations;
-      } //
-      combination.push_back(newCandidate);
-      combinationSum(candidates, newCandidate);
+    generateCombinations(candidates, 0, target);
+    return allCombinations;
+  }
+  vector<vector<int>> allPermutations;
+  vector<int> permutation;
+  void generatePermutations(vector<int> &nums, int idx) {
+    if (idx == nums.size()) { // function is called nums.size() times(leaf node)
+      allPermutations.push_back(subset);
+      return;
     }
-    return combinations;
+    permutation.push_back(nums[idx]); // include nums[idx]
+    generatePermutations(nums, idx + 1);
+  }
+  vector<vector<int>> permute(vector<int> &nums) {
+    generatePermutations(nums, 0);
+    return allPermutations;
   }
 };
 int main() {
   Solution s;
-  vector<int> nums = {2, 3, 6, 7};
-  vector<vector<int>> res = s.combinationSum(nums, 7);
+  vector<int> nums = {1, 2, 3};
+  // vector<vector<int>> res = s.combinationSum(nums, 7);
+  vector<vector<int>> res = s.permute(nums);
   for (auto vec : res) {
     for (auto val : vec) {
       cout << val << " ";
