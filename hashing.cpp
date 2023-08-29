@@ -20,6 +20,20 @@ public:
     }
     return {};
   }
+  // 383. Ransom Note
+  bool canConstruct(string ransomNote, string magazine) {
+    unordered_map<char, int> map;
+    int i, j;
+    for (const char &val : magazine)
+      map[val]++;
+    for (const char &val : ransomNote) {
+      if (!map.count(val))
+        return false;
+      if (--map[val] == 0)
+        map.erase(val);
+    }
+    return true;
+  }
   // 217. Contains Duplicate
   bool containsDuplicate(vector<int> &nums) {
     unordered_set<int> set;
@@ -83,11 +97,11 @@ public:
     vector<int> mostFrequent;
     unordered_map<int, int> counter;
     // populate
-    for (int num : nums) {
+    for (int num : nums)
       counter[num]++;
-    }
-    // sort counter
+    // convert map to vector
     vector<pair<int, int>> sortedMap(counter.begin(), counter.end());
+    // sort counter by value (pair.second)
     sort(sortedMap.begin(), sortedMap.end(),
          [](const pair<int, int> &a, const pair<int, int> &b) {
            return a.second > b.second;
@@ -98,7 +112,8 @@ public:
   }
 };
 int main() {
-  int target = 2;
+  Solution s;
+  int target = 1;
   vector<int> vec = {1};
   vector<int> res = s.topKFrequent(vec, target);
   for (int item : res)

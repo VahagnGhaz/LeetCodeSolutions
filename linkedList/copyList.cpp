@@ -5,7 +5,7 @@
 #include <unordered_set>
 #include <vector>
 using namespace std;
-
+// 138. Copy List with Random Pointer
 class Node {
 public:
   int val;
@@ -21,26 +21,23 @@ public:
 
 class Solution {
 public:
-  Node *vectorToBinary(vector<vector<int>> vec) {
+  Node *vectorToList(vector<vector<int>> vec) {
     unordered_map<int, Node *> map;
     Node *currentCopy = nullptr;
     int idx = 0;
-    for (auto v : vec)
+    for (auto v : vec) // populate without connecting
       map[idx++] = new Node(v[0]);
-    int length = idx;
-    map[length] = nullptr; // last element
-    // current = head;
+    int vecLength = idx;
+    map[vecLength] = nullptr; // last element
     idx = 0;
-    // for (auto &pair : map) {
-    //   cout << pair.first << " " << pair.second << endl;
-    // }
+
     int randomNodeIndex;
     for (auto v : vec) {
-      map[idx]->next = map[idx + 1];
-      if (v[1] != -1)
+      map[idx]->next = map[idx + 1]; // next pointer
+      if (v[1] != -1)                // random pointer
         randomNodeIndex = v[1];
       else
-        randomNodeIndex = length;
+        randomNodeIndex = vecLength; // last index is for nullptr
       map[idx]->random = map[randomNodeIndex];
       idx++;
     }
@@ -48,44 +45,28 @@ public:
   }
 
   Node *copyRandomList(Node *head) {
-    unordered_map<int, pair<int, Node *>> map; // {idx, (node->val, node)}
+    unordered_map<Node *, Node *> map; // {oldNode, newNode}
     Node *current = head;
     // create nodes without connecting and populate the map
-    int idx = 0;
     while (current != nullptr) {
-      map[idx] = pair{current->val, new Node(current->val)};
+      map[current] = new Node(current->val);
       current = current->next;
-      idx++;
     }
-    map[idx] = pair{-1, nullptr}; // last node with random pointer
-    // iterate again, populate next and random pointers
+    map[nullptr] = nullptr; // last node with random pointer
     current = head;
-    int randomNodeIndex, nextNodeIndex;
-    idx = 0;
     while (current != nullptr) {
-
-      if (current->next != nullptr)
-        nextNodeIndex = current->next->val;
-      else
-        nextNodeIndex = -1; // last node
-
-      map[idx].second->next = map[nextNodeIndex].second;
-      if (current->random != nullptr)
-        randomNodeIndex = current->random->val;
-      else
-        randomNodeIndex = -1;
-      map[idx].second->random = map[randomNodeIndex].second;
+      map[current]->next = map[current->next];
+      map[current]->random = map[current->random];
       current = current->next;
-      idx++;
     }
-    return map[idx].second; // head
+    return map[head];
   }
 };
 
 int main() {
   Solution s;
   vector<vector<int>> vec = {{3, -1}, {3, 0}, {3, -1}};
-  Node *head = s.vectorToBinary(vec);
+  Node *head = s.vectorToList(vec);
   Node *res = s.copyRandomList(head);
   while (res != nullptr) {
     cout << res->val << " ";

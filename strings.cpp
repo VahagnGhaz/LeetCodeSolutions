@@ -7,22 +7,6 @@
 using namespace std;
 class Solution {
 public:
-  // 383. Ransom Note
-  bool canConstruct(string ransomNote, string magazine) {
-
-    unordered_map<char, int> map;
-    int i, j;
-
-    for (const char &val : magazine)
-      map[val]++;
-    for (const char &val : ransomNote) {
-      if (!map.count(val))
-        return false;
-      if (--map[val] == 0)
-        map.erase(val);
-    }
-    return true;
-  }
   // 242. Valid Anagram
   bool isAnagram(string s, string t) {
     int i;

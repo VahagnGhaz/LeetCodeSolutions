@@ -5,22 +5,17 @@
 #include <unordered_set>
 #include <vector>
 using namespace std;
-struct ListNode {
-  int val;
-  ListNode *next;
-  ListNode() : val(0), next(nullptr) {}
-  ListNode(int x) : val(x), next(nullptr) {}
-  ListNode(int x, ListNode *next) : val(x), next(next) {}
-};
-
+// 146. LRU Cache
 struct DoubleListNode {
   int val;
+  int idx; // for tracking map key
   DoubleListNode *next;
   DoubleListNode *prev;
   DoubleListNode() : val(0), next(nullptr), prev(nullptr) {}
-  DoubleListNode(int x) : val(x), next(nullptr), prev(nullptr) {}
-  DoubleListNode(int x, DoubleListNode *next, DoubleListNode *prev)
-      : val(x), next(next), prev(prev) {}
+  DoubleListNode(int val, int idx)
+      : val(val), idx(idx), next(nullptr), prev(nullptr) {}
+  DoubleListNode(int val, int idx, DoubleListNode *next, DoubleListNode *prev)
+      : val(val), idx(idx), next(next), prev(prev) {}
 };
 
 class LRUCache {
@@ -34,96 +29,89 @@ class LRUCache {
   cause of the updateLru the TC is O(n) and has Time Limit Exceeded error
 
   2) O(1) solution: doubleLinkedList and keep ListNode inside hashmap
-  SC of both solutions is O(n)
+  SC of both solutions is O(n),
+  ! doubleLinkedList head is keeping least recently
+  used value, while tail is keeping the recently used value
+  // CAREFUL
+  // 1) value and index are different, need to update value every time
+  // 2) can update the cache even if cache is not full
+  // 3) when NewRecentlyUsed == leastRecentlyUsed is edge case
   */
 public:
   int cap = 0;
   unordered_map<int, DoubleListNode *> cache;
-  //   ListNode *lruHead, *lruTail;
-  DoubleListNode *lruHead, *lruTail;
+  DoubleListNode *leastRecentlyUsed, *recentlyUsed; // head, tail
 
   LRUCache(int capacity) {
     cap = capacity;
-    lruHead = lruTail = new DoubleListNode();
+    leastRecentlyUsed = recentlyUsed = nullptr;
+  }
+  void updateRecentlyUsed(int key) {
+    DoubleListNode *NewRecentlyUsed = cache[key];
+    if (NewRecentlyUsed == recentlyUsed) // no updated needed
+      return;
+    if (NewRecentlyUsed == leastRecentlyUsed)      // (see point (3) in docs)
+      leastRecentlyUsed = leastRecentlyUsed->next; // new LRU
+    else // NewRecentlyUsed->prev is not null:
+      NewRecentlyUsed->prev->next = NewRecentlyUsed->next; // unbind
+
+    NewRecentlyUsed->next->prev = NewRecentlyUsed->prev;
+    NewRecentlyUsed->next = nullptr; // tail value
+    NewRecentlyUsed->prev = recentlyUsed;
+
+    recentlyUsed->next = NewRecentlyUsed;
+    recentlyUsed = NewRecentlyUsed;
+  }
+
+  void addToCache(int key, int value) {
+    DoubleListNode *newNode =
+        new DoubleListNode(value, key, nullptr, recentlyUsed);
+    if (recentlyUsed == nullptr) // the first added value
+      leastRecentlyUsed = newNode;
+    else
+      recentlyUsed->next = newNode;
+    recentlyUsed = newNode; // update tail to newest value
+    cache[key] = newNode;
+    cap--;
+  }
+  void removeLeastRecentlyUsed(int key, int value) {
+    recentlyUsed->next = new DoubleListNode(value, key, nullptr, recentlyUsed);
+    recentlyUsed = recentlyUsed->next;
+    DoubleListNode *nodeToDelete = leastRecentlyUsed;
+    leastRecentlyUsed->next->prev = nullptr; // unbind
+    leastRecentlyUsed = leastRecentlyUsed->next;
+    cache.erase(nodeToDelete->idx); // remove from cache
+    delete nodeToDelete;
   }
   void put(int key, int value) {
-    if (cache.count(key) == 0) // new key does not exist in cash
-    {
-      DoubleListNode *newNode = new DoubleListNode(value);
-      //   if (cap == 0) // if no space in cash
-      //   {
-      //     ListNode *lru = lruHead->next;       // least recent used node
-      //     cache.erase(lru->val);               // evict
-      //     lruHead->next = lruHead->next->next; // remove from queue
-      //     if (lru == lruTail)                  // no element left
-      //       lruTail = lruHead;
-      //     delete lru;
-      //   } else
-      //     cap--;
-      //   lruTail = lruTail->next = new ListNode(key, nullptr); // add to the
-      //   end
-      // } else
-      //   updateLru(key);
-      cache[key] = newNode;
+    if (cap != 0 && cache.count(key) == 0) // (see point (2) in docs)
+      addToCache(key, value);
+    else {
+      if (cache.count(key) != 0) { // new key exists in cache
+        cache[key]->val = value;   // update value (see point (1) in docs)
+        updateRecentlyUsed(key);
+      } else // new key does not exists in cache
+        removeLeastRecentlyUsed(key, value);
+      cache[key] = recentlyUsed;
     }
-    int get(int key) {
-      if (cache.count(key) == 0)
-        return -1;
-      updateLru(key);
-      return cache[key];
-    }
-    // sol1: time limit Exceeded
-    //   void updateLru(int key) {
-    //     ListNode *current = lruHead;
-    //     ListNode *foundNode = nullptr;
-    //     // why current->next->next? if (foundNode == tailNode) return; (no
-    //     update) while (current->next->next) {
-    //       if (current->next->val == key) { // value exists in cash
-    //         ListNode *foundNode = current->next;
-    //         current->next = current->next->next; // remove from list
-    //         foundNode->next = nullptr;           // add to the end
-    //         lruTail = lruTail->next = foundNode;
-    //         break;
-    //       } else
-    //         current = current->next; // update pointer
-    //     }
-    //   }
-    //   int get(int key) {
-    //     if (cache.count(key) == 0)
-    //       return -1;
-    //     updateLru(key);
-    //     return cache[key];
-    //   }
-    //   void put(int key, int value) {
-    //     if (cache.count(key) == 0) // new key does not exist in cash
-    //     {
-    //       if (cap == 0) // if no space in cash
-    //       {
-    //         ListNode *lru = lruHead->next; // least recent used node
-    //         cache.erase(lru->val);               // evict
-    //         lruHead->next = lruHead->next->next; // remove from queue
-    //         if (lru == lruTail)                  // no element left
-    //           lruTail = lruHead;
-    //         delete lru;
-    //       } else
-    //         cap--;
-    //       lruTail = lruTail->next = new ListNode(key, nullptr); // add to the
-    //       end
-    //     } else
-    //       updateLru(key);
-    //     cache[key] = value;
-    //   }
-  };
-
-  int main() {
-    LRUCache lRUCache = LRUCache(2);
-    lRUCache.put(1, 1); // cache is {1=1}
-    lRUCache.put(2, 2); // cache is {1=1, 2=2}
-    lRUCache.get(1);    // return 1
-    lRUCache.put(3, 3); // LRU key was 2, evicts key 2, cache is {1=1, 3=3}
-    lRUCache.get(2);    // returns -1 (not found)
-    lRUCache.put(4, 4); // LRU key was 1, evicts key 1, cache is {4=4, 3=3}
-    lRUCache.get(1);    // return -1 (not found)
-    lRUCache.get(3);    // return 3
-    lRUCache.get(4);    // return 4
   }
+  int get(int key) {
+    if (cache.count(key) == 0)
+      return -1;
+    updateRecentlyUsed(key);
+    return cache[key]->val;
+  }
+};
+
+int main() {
+  LRUCache lRUCache = LRUCache(2);
+  lRUCache.put(1, 1); // cache is {1=1}
+  lRUCache.put(2, 2); // cache is {1=1, 2=2}
+  lRUCache.get(1);    // return 1
+  lRUCache.put(3, 3); // LRU key was 2, evicts key 2, cache is {1=1, 3=3}
+  lRUCache.get(2);    // returns -1 (not found)
+  lRUCache.put(4, 4); // LRU key was 1, evicts key 1, cache is {4=4, 3=3}
+  lRUCache.get(1);    // return -1 (not found)
+  lRUCache.get(3);    // return 3
+  lRUCache.get(4);    // return 4
+}

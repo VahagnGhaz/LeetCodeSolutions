@@ -4,7 +4,7 @@
 #include <queue>
 #include <vector>
 using namespace std;
-
+// 703. Kth Largest Element in a Stream
 class KthLargest {
 public:
   // cause we only add and not remove, keep only first k elements, the rest
@@ -45,7 +45,6 @@ public:
     return minHeap.top();       // return smallest element of k size minHeap
   }
 };
-
 // int main(int argc, char const *argv[]) {
 //   vector<int> nums = {};
 //   // KthLargest kthLargest = KthLargest(3, nums);
@@ -61,6 +60,7 @@ public:
 
 class Solution {
 public:
+  // 1046. Last Stone Weight
   int lastStoneWeight(vector<int> &stones) {
     // Time: O(nlogn)
     priority_queue<int> weights;
@@ -78,11 +78,10 @@ public:
     weights.push(0); // in case weights are empty
     return weights.top();
   }
-
+  // 973. K Closest Points to Origin
   vector<vector<int>> kClosest(vector<vector<int>> &points, int k) {
     vector<vector<int>> closesKPoints;
     // 1. sort Time: O(nlogn + k)
-
     // auto closerToOrigin = [](const vector<int> &a, const vector<int> &b) {
     //   return sqrt(pow(a[0], 2) + pow(a[1], 2)) <
     //          sqrt(pow(b[0], 2) + pow(b[1], 2));

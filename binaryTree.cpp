@@ -209,7 +209,7 @@ public:
       return true;
     return isSubtree(root->left, subRoot) || isSubtree(root->right, subRoot);
   }
-
+  // 235. Lowest Common Ancestor of a Binary Search Tree
   TreeNode *lowestCommonAncestor(TreeNode *root, TreeNode *p, TreeNode *q) {
     // 1. works for all kinds of trees: Time: O(n) Space: O(logn) if balanced
     // else O(n) ( maximum depth of the recursion stack )
@@ -239,7 +239,7 @@ public:
     }
     return nullptr; // guaranteed to not reach here
   }
-
+  // 102. Binary Tree Level Order Traversal
   vector<vector<int>> levelOrder(TreeNode *root) {
     // BFS
     vector<vector<int>> levels;
@@ -263,6 +263,7 @@ public:
     }
     return levels;
   }
+  // 199. Binary Tree Right Side View
   vector<int> rightSideView(TreeNode *root) {
     // for every level keep rightest node
     vector<int> rightSide;
@@ -291,6 +292,7 @@ public:
     }
     return rightSide;
   }
+  // 98. Validate Binary Search Tree
   bool isValidBSTCore(TreeNode *root, long long leftBoundary,
                       long long rightBoundary) {
     bool bstInvariant = true;

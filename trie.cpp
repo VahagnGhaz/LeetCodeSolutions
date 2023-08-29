@@ -7,6 +7,7 @@ struct TrieNode {
   bool endOfString;
   unordered_map<char, TrieNode *> children;
 };
+// 208. Implement Trie (Prefix Tree)
 class Trie {
 public:
   TrieNode *root;
@@ -97,13 +98,14 @@ public:
       return node->endOfString;
     }
   };
-  int main() {
-    Trie trie = Trie();
-    trie.insert("apple");
-    cout << trie.search("apple") << endl;   // return True
-    cout << trie.search("app") << endl;     // return False
-    cout << trie.startsWith("app") << endl; // return True
-    trie.insert("app");
-    cout << trie.search("app") << endl; // return True
-    return 0;
-  }
+};
+int main() {
+  Trie trie = Trie();
+  trie.insert("apple");
+  cout << trie.search("apple") << endl;   // return True
+  cout << trie.search("app") << endl;     // return False
+  cout << trie.startsWith("app") << endl; // return True
+  trie.insert("app");
+  cout << trie.search("app") << endl; // return True
+  return 0;
+}

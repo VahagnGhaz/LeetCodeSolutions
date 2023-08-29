@@ -20,6 +20,7 @@ struct TreeNode {
 
 class Solution {
 public:
+  // 78. Subsets
   vector<vector<int>> allSubsets;
   vector<int> subset;
   void generateSubsets(vector<int> &nums, int idx) {
@@ -36,6 +37,8 @@ public:
     generateSubsets(nums, 0);
     return allSubsets;
   }
+
+  // 39. Combination Sum
   int sum = 0;
   vector<int> combination;
   vector<vector<int>> allCombinations;
